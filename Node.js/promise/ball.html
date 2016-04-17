@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Promise animation</title>
+	<style>
+	.ball{
+		width:40px;
+		height:40px;
+		border-radius:20px;
+	}
+
+	.ball1{
+		background:red;
+	}
+	.ball2{
+		background:yellow;
+	}
+	.ball3{
+		background:green;
+	}
+	</style>
+</head>
+<body>
+<div class="ball ball1" style="margin-left:0px"></div>
+<div class="ball ball2" style="margin-left:0px;"></div>
+<div class="ball ball3" style="margin-left:0px;"></div>
+
+<script>
+	// 使用原始原生JavaScript实现动画效果
+	// 利用回调函数模式
+	// 注意: elem.style只能获取元素行内用style设置的属性
+	// 即ball1.style.marginLeft只能获取
+	// <div class="ball1" style="margin-left:0px;"></div>
+	var ball1 = document.querySelector(".ball1");
+	var ball2 = document.querySelector(".ball2");
+	var ball3 = document.querySelector(".ball3");
+	function animate(ball,distance,cb){
+		setTimeout(function(){
+			var marginLeft = parseInt(ball.style.marginLeft,10);		
+			if(marginLeft === distance){
+				cb && cb();
+			}else{
+				if(marginLeft < distance){
+					marginLeft += 1;
+				}else{
+					marginLeft -= 1;
+				}	
+				ball.style.marginLeft = marginLeft + "px";
+				animate(ball,distance,cb);
+			} 
+			
+		},2);
+	}
+	// 调用函数
+	// animate(ball1,100,function(){
+	// 	animate(ball2,200,function(){
+	// 		animate(ball3,300,function(){
+	// 			animate(ball3,150,function(){
+	// 				animate(ball2,150,function(){
+	// 					animate(ball1,150,function(){
+	// 						ball.style.backgroundColor = black;
+	// 					});
+	// 				});
+	// 			});
+	// 		});
+	// 	});
+	// });
+
+
+	// 使用Promise实现动画
+	// 注意: 回调的resolve，一定要加上()，不然无法实现效果
+	var Promise = window.Promise;
+	function promiseAnimate(ball,distance){
+		return new Promise(function(resolve,reject){
+			function _animate(){
+				setTimeout(function(){
+					var marginLeft = parseInt(ball.style.marginLeft,10);		
+					if(marginLeft === distance){
+						resolve();
+					}else{
+						if(marginLeft < distance){
+							marginLeft += 1;
+						}else{
+							marginLeft -= 1;
+						}	
+						ball.style.marginLeft = marginLeft + "px";
+						_animate();
+					}
+				},2);
+			}
+			_animate();
+		});           	   	
+	}
+
+	// promiseAnimate(ball1,100).then(function(){
+	// 	return promiseAnimate(ball2,200)
+	// }).then(function(){
+	// 	return promiseAnimate(ball3,300)
+	// }).then(function(){
+	// 	return promiseAnimate(ball3,150)
+	// }).then(function(){
+	// 	return promiseAnimate(ball2,150)
+	// }).then(function(){
+	// 	return promiseAnimate(ball1,150)
+	// })
+
+
+// then的一般用法
+// var promise = new Promise(function(resolve, reject) {
+//   setTimeout(function(){
+//     resolve();
+//   },25);
+// });
+
+//  promise.then(function(){alert("110");})
+
+</script>
+</body>
+</html>
